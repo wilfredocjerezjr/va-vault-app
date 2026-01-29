@@ -3,227 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VA Vault HYBRID</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>VA Vault NATIVE</title>
     <style>
-        body { background-color: #0b1120; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .tab-panel { display: none; animation: slideUp 0.3s ease-out; }
-        .tab-panel.active { display: block; }
-        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
-        .script-card:active { transform: scale(0.98); background: #1e293b; }
-        /* Hide scrollbar */
-        .no-scroll::-webkit-scrollbar { display: none; }
-        .no-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        /* --- NATIVE CSS (NO DOWNLOADS NEEDED) --- */
+        :root { --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --blue: #3b82f6; --green: #22c55e; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: sans-serif; padding-bottom: 80px; }
+        
+        /* HEADER */
+        .header { background: rgba(15, 23, 42, 0.9); padding: 15px; position: sticky; top: 0; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
+        .logo { font-weight: 900; color: var(--blue); font-size: 1.2rem; }
+        .badge { background: #dc2626; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 4px; vertical-align: middle; margin-left: 5px; }
+        .rate-box { text-align: right; }
+        .rate-lbl { font-size: 0.6rem; color: #94a3b8; font-weight: bold; }
+        .rate-val { font-family: monospace; font-size: 1.1rem; color: var(--green); font-weight: bold; }
+
+        /* SEARCH */
+        .search-area { padding: 10px 15px; background: #0f172a; position: sticky; top: 60px; z-index: 90; }
+        input { width: 100%; padding: 12px 15px; background: #1e293b; border: 1px solid #334155; border-radius: 10px; color: white; font-size: 1rem; outline: none; }
+        input:focus { border-color: var(--blue); }
+
+        /* TABS & CONTENT */
+        .tab-content { display: none; padding: 15px; }
+        .tab-content.active { display: block; animation: fade 0.2s; }
+        @keyframes fade { from {opacity:0; transform:translateY(5px);} to {opacity:1; transform:translateY(0);} }
+
+        /* CATEGORIES */
+        .cat-scroll { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 15px; padding-bottom: 5px; }
+        .cat-btn { background: #334155; border: none; color: #94a3b8; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; white-space: nowrap; cursor: pointer; }
+        .cat-btn.active { background: var(--blue); color: white; }
+
+        /* SCRIPT CARDS */
+        .card { background: var(--card); border: 1px solid #334155; border-radius: 12px; padding: 15px; margin-bottom: 10px; }
+        .card-head { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .card-title { font-weight: bold; font-size: 0.9rem; color: #60a5fa; }
+        .card-tag { font-size: 0.6rem; background: #334155; padding: 2px 6px; border-radius: 4px; }
+        .card-text { background: #0f172a; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; color: #cbd5e1; line-height: 1.4; border-left: 3px solid var(--blue); margin-bottom: 12px; }
+        .copy-btn { width: 100%; background: var(--blue); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; }
+        .copy-btn:active { opacity: 0.8; transform: scale(0.98); }
+
+        /* TOOLS GRID */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .tool-box { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 10px; }
+        .tool-title { font-weight: bold; font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; display: block; }
+        .big-val { font-size: 1.5rem; font-weight: 900; margin-top: 5px; }
+
+        /* BOTTOM NAV */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #1e293b; border-top: 1px solid #334155; display: flex; justify-content: space-around; padding: 10px 0; z-index: 200; }
+        .nav-btn { background: none; border: none; color: #64748b; font-size: 0.7rem; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-btn.active { color: var(--blue); }
+        .nav-icon { font-size: 1.2rem; }
+
+        /* TOAST */
+        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: white; color: black; padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; opacity: 0; transition: 0.3s; pointer-events: none; }
+        #toast.show { opacity: 1; bottom: 90px; }
     </style>
 </head>
-<body class="pb-24">
+<body>
 
-    <header class="glass sticky top-0 z-50 p-3 border-b border-slate-700 shadow-2xl">
-        <div class="flex justify-between items-center max-w-2xl mx-auto">
-            <div>
-                <h1 class="text-lg font-black text-blue-500 tracking-tighter">VA VAULT <span class="text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded align-middle">HYBRID</span></h1>
-                <div class="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
-                    <span id="net-status" class="flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-yellow-500" id="status-dot"></div> CONNECTING...</span>
-                </div>
-            </div>
-            <div class="text-right">
-                <div class="text-[9px] font-bold text-slate-500 uppercase">LIVE RATE ($1)</div>
-                <div class="text-xl font-mono font-bold text-green-400 leading-none" id="live-rate">---</div>
-            </div>
-        </div>
-    </header>
-
-    <div class="p-3 max-w-2xl mx-auto sticky top-[60px] z-40 bg-[#0b1120]">
-        <div class="relative">
-            <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-500"></i>
-            <input type="text" id="search" placeholder="Search 400+ Scripts..." class="w-full bg-slate-800 text-white pl-10 pr-4 py-3 rounded-xl border border-slate-700 focus:border-blue-500 outline-none shadow-lg" onkeyup="doSearch()">
+    <div class="header">
+        <div class="logo">VA VAULT <span class="badge">PRO</span></div>
+        <div class="rate-box">
+            <div class="rate-lbl">USD RATE</div>
+            <div class="rate-val" id="live-rate">₱58.50</div>
         </div>
     </div>
 
-    <main class="max-w-2xl mx-auto px-3">
-
-        <div id="view-db" class="tab-panel active">
-            <div class="flex overflow-x-auto gap-2 pb-2 mb-2 no-scroll" id="cat-container">
-                </div>
-            <div id="script-container" class="space-y-3 pb-10">
-                </div>
-        </div>
-
-        <div id="view-tools" class="tab-panel">
-            <div class="grid grid-cols-2 gap-3">
-                
-                <div class="glass p-4 rounded-xl text-center border-t-2 border-yellow-500">
-                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-1"><i class="fa-regular fa-clock"></i> NEW YORK</div>
-                    <div class="text-xl font-black text-white" id="time-ny">--:--</div>
-                    <div class="text-[9px] text-slate-500" id="date-ny">Loading</div>
-                </div>
-                <div class="glass p-4 rounded-xl text-center border-t-2 border-purple-500">
-                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-1"><i class="fa-regular fa-clock"></i> LONDON</div>
-                    <div class="text-xl font-black text-white" id="time-uk">--:--</div>
-                    <div class="text-[9px] text-slate-500" id="date-uk">Loading</div>
-                </div>
-
-                <div class="col-span-2 glass p-5 rounded-xl border border-slate-700">
-                    <div class="flex items-center gap-2 mb-3 text-blue-400">
-                        <i class="fa-solid fa-money-bill-transfer"></i>
-                        <h2 class="font-bold text-sm">INCOME PROJECTOR</h2>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 mb-3">
-                        <div>
-                            <label class="text-[10px] text-slate-500 font-bold">RATE ($)</label>
-                            <input type="number" id="in-rate" class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-white font-bold" placeholder="5" oninput="calc()">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-slate-500 font-bold">HOURS/WK</label>
-                            <input type="number" id="in-hours" class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-white font-bold" placeholder="40" oninput="calc()">
-                        </div>
-                    </div>
-                    <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-4 rounded-lg flex justify-between items-center border border-blue-500/30">
-                        <div class="text-xs font-bold text-blue-200">MONTHLY<br>GROSS</div>
-                        <div class="text-right">
-                            <div class="text-2xl font-black text-white" id="out-php">₱0</div>
-                            <div class="text-[10px] text-slate-400" id="out-usd">$0.00</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-span-2 glass p-5 rounded-xl border border-slate-700">
-                    <h2 class="font-bold text-sm text-red-400 mb-3"><i class="fa-solid fa-hand-holding-dollar"></i> REAL TAKE HOME PAY</h2>
-                    <div class="flex gap-2 mb-3">
-                        <button onclick="fee(0.2)" class="flex-1 bg-slate-800 hover:bg-red-900/40 py-2 rounded text-[10px] font-bold border border-slate-600 transition">UPWORK 20%</button>
-                        <button onclick="fee(0.1)" class="flex-1 bg-slate-800 hover:bg-red-900/40 py-2 rounded text-[10px] font-bold border border-slate-600 transition">UPWORK 10%</button>
-                        <button onclick="fee(0.05)" class="flex-1 bg-slate-800 hover:bg-red-900/40 py-2 rounded text-[10px] font-bold border border-slate-600 transition">RAKET 5%</button>
-                    </div>
-                    <div class="bg-slate-900 p-3 rounded flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-400">NET CASH:</span>
-                        <span class="text-lg font-black text-green-400" id="out-net">₱0</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-set" class="tab-panel">
-            <div class="glass p-5 rounded-xl">
-                <h2 class="font-bold text-white mb-4">Manual Override</h2>
-                <p class="text-xs text-slate-400 mb-2">If internet fails, force the rate here:</p>
-                <div class="flex gap-2">
-                    <input type="number" id="manual-rate" class="flex-1 bg-slate-900 p-3 rounded border border-slate-600 text-white font-bold" placeholder="e.g. 59">
-                    <button onclick="forceRate()" class="bg-blue-600 text-white px-6 rounded font-bold text-xs">SAVE</button>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <nav class="fixed bottom-0 w-full glass border-t border-slate-700 pb-safe z-50 bg-[#0b1120]">
-        <div class="flex justify-around">
-            <button onclick="switchTab('view-db')" class="nav-btn active flex-1 py-3 text-center text-slate-500 hover:text-blue-400">
-                <i class="fa-solid fa-layer-group text-xl mb-1 block"></i>
-                <span class="text-[9px] font-bold">VAULT</span>
-            </button>
-            <button onclick="switchTab('view-tools')" class="nav-btn flex-1 py-3 text-center text-slate-500 hover:text-blue-400">
-                <i class="fa-solid fa-microchip text-xl mb-1 block"></i>
-                <span class="text-[9px] font-bold">TOOLS</span>
-            </button>
-            <button onclick="switchTab('view-set')" class="nav-btn flex-1 py-3 text-center text-slate-500 hover:text-blue-400">
-                <i class="fa-solid fa-sliders text-xl mb-1 block"></i>
-                <span class="text-[9px] font-bold">CONFIG</span>
-            </button>
-        </div>
-    </nav>
-
-    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-white text-black px-4 py-2 rounded-full text-xs font-bold shadow-xl opacity-0 transition pointer-events-none z-[100]">
-        COPIED!
+    <div class="search-area">
+        <input type="text" id="search" placeholder="Search 50+ Scripts..." onkeyup="doSearch()">
     </div>
+
+    <div id="main-container">
+        
+        <div id="tab-vault" class="tab-content active">
+            <div class="cat-scroll" id="cat-list">
+                </div>
+            <div id="script-list">
+                </div>
+        </div>
+
+        <div id="tab-tools" class="tab-content">
+            <div class="tool-box">
+                <span class="tool-title" style="color:#60a5fa">SALARY CALCULATOR</span>
+                <div class="grid">
+                    <div>
+                        <span class="rate-lbl">RATE ($)</span>
+                        <input type="number" id="in-rate" value="5" oninput="calc()" style="padding:8px;">
+                    </div>
+                    <div>
+                        <span class="rate-lbl">HOURS/WK</span>
+                        <input type="number" id="in-hours" value="40" oninput="calc()" style="padding:8px;">
+                    </div>
+                </div>
+                <div style="margin-top:15px; background:#0f172a; padding:10px; border-radius:8px; text-align:center;">
+                    <div class="rate-lbl">MONTHLY GROSS</div>
+                    <div class="big-val" id="out-php" style="color:white">₱0</div>
+                    <div class="rate-lbl" id="out-usd">$0 USD</div>
+                </div>
+            </div>
+
+            <div class="tool-box">
+                <span class="tool-title" style="color:#f87171">FEE DEDUCTOR (NET PAY)</span>
+                <div style="display:flex; gap:5px; margin-bottom:10px;">
+                    <button onclick="fee(0.2)" class="cat-btn" style="flex:1">Upwork 20%</button>
+                    <button onclick="fee(0.1)" class="cat-btn" style="flex:1">10%</button>
+                    <button onclick="fee(0.05)" class="cat-btn" style="flex:1">Raket 5%</button>
+                </div>
+                <div style="background:#0f172a; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <span class="rate-lbl">TAKE HOME:</span>
+                    <span class="big-val" id="out-net" style="font-size:1.2rem; color:#4ade80">₱0</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-conf" class="tab-content">
+            <div class="tool-box">
+                <span class="tool-title">SYSTEM CONFIG</span>
+                <p class="rate-lbl">If live rate fails, set manual rate here:</p>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <input type="number" id="man-rate" placeholder="58.50">
+                    <button class="copy-btn" style="width:auto;" onclick="saveRate()">SAVE</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav">
+        <button class="nav-btn active" onclick="switchTab('tab-vault', this)">
+            <span class="nav-icon">📚</span> VAULT
+        </button>
+        <button class="nav-btn" onclick="switchTab('tab-tools', this)">
+            <span class="nav-icon">🧮</span> TOOLS
+        </button>
+        <button class="nav-btn" onclick="switchTab('tab-conf', this)">
+            <span class="nav-icon">⚙️</span> CONFIG
+        </button>
+    </div>
+
+    <div id="toast">COPIED TO CLIPBOARD</div>
 
     <script>
-        // --- 1. CONFIG & STATE ---
-        let phpRate = 58.50; // Fallback default
-        let activeCat = 'A';
-
-        // --- 2. DATABASE (EXPANDED) ---
-        const db = [
-            // A: OUTREACH
-            {cat:'A', title:'Cold DM (IG)', text:"Hi [Name], I noticed a broken link in your bio. I made a list of 3 quick fixes to improve your conversion. Want me to send them over? No strings attached."},
-            {cat:'A', title:'LinkedIn Founder', text:"Hi [Name], I help founders reclaim 15 hours/week by handling admin chaos. I don't want a job, I want to solve problems. Let's connect."},
-            {cat:'A', title:'Real Estate Lead', text:"Hi [Name], I specialize in skip tracing. I can provide 50 verified leads with phone numbers this week as a free trial to prove my quality. Interested?"},
-            {cat:'A', title:'E-com Abandoned', text:"Hi [Brand], I noticed you don't have an email flow for abandoned carts. I can set this up to recover 20% of lost sales. No upfront cost, just results."},
-            {cat:'A', title:'Upwork Proposal', text:"I read your job post about [Problem] and I know exactly how to fix it. I just did a similar task for a previous client and saved them 20 hours. Here is my plan..."},
-            {cat:'A', title:'Re-engage Client', text:"Hi [Name], I have some capacity opening up next month and I enjoyed our last project. Are you still looking for help with [Task]?"},
-            
-            // B: DEFENSE
-            {cat:'B', title:'No Experience', text:"I may be new to this platform, but I bring a figure-it-out mindset. You are hiring attitude, not just history. I master new tools in 24 hours."},
-            {cat:'B', title:'Rate Too High', text:"I understand budget is a factor. However, a $3 VA might take 5 hours; I finish in 2 hours with zero errors. Ultimately, I cost you less."},
-            {cat:'B', title:'See Portfolio?', text:"I prioritize confidentiality, so I don't share private data. However, I can do a paid 'Test Task' right now to prove my skills are live."},
-            {cat:'B', title:'Think about it', text:"Completely understand. What is the one thing holding you back right now? I'd love to clarify it before we end the call."},
-
-            // C: OPERATIONS
-            {cat:'C', title:'Weekly Report', text:"End-of-Week Update:\n✅ Completed: [Task A]\n⏳ Pending: [Task B]\n🎯 Goal next week: [Goal]\nHave a great weekend!"},
-            {cat:'C', title:'Admit Mistake', text:"Flagging that I made an error on [Task]. I've already fixed it by [Solution] and updated our SOP to ensure it never happens again. Taking responsibility."},
-            {cat:'C', title:'Suggest Tool', text:"Hi [Name], we spend 3 hours on [Task]. If we use [Tool] ($10/mo), we cut this to 15 mins. Saves us money long term. Thoughts?"},
-            {cat:'C', title:'Sick Leave', text:"Hi [Name], I'm not feeling well and need to take a sick day. I've ensured [Urgent Task] is handled. I'll be back on [Date]."},
-
-            // D: MONEY
-            {cat:'D', title:'Ask Raise', text:"Hi [Name], since starting 6 months ago, I've increased output by 30%. I'd like to adjust my rate to [New Rate] to reflect this value."},
-            {cat:'D', title:'Ask Deposit', text:"To secure my slot in your calendar, I require a 50% upfront deposit. Once received, I will start the onboarding process immediately."},
-            {cat:'D', title:'Trial Close', text:"If you're hesitant, let's do a 1-week paid trial. If you're happy, we move to a monthly retainer. If not, no hard feelings."},
-
-            // E: SELLER
-            {cat:'E', title:'How Much? (Value)', text:"The price is [Price]. It features [Benefit]. If you order today, I can include a freebie. Shall I reserve one?"},
-            {cat:'E', title:'Last Price?', text:"This is already our best promo price. But if you get 2 items, I can give you free shipping. Deal?"},
-            {cat:'E', title:'COD Confirm', text:"To process your COD order, reply with: Name, Address, Phone Number. I will send a photo before packing!"},
-            {cat:'E', title:'Follow Up', text:"Hi! I'm about to ship orders. Do you want me to include your item so you get it faster? Let me know!"},
-            
-            // F: CRISIS
-            {cat:'F', title:'Angry Client', text:"I hear your frustration and take full responsibility. Plan to fix: [Step 1], [Step 2]. I will update you in 1 hour."},
-            {cat:'F', title:'Scope Creep', text:"I'd love to help! Since this is outside our agreement, it will be an additional [Amount]. Shall I add it to the invoice?"}
-        ];
-
-        const cats = [
-            {id:'A', name:'HUNTING', icon:'fa-crosshairs'},
-            {id:'B', name:'DEFENSE', icon:'fa-shield'},
-            {id:'C', name:'OPS', icon:'fa-briefcase'},
-            {id:'D', name:'MONEY', icon:'fa-dollar-sign'},
-            {id:'E', name:'SELLER', icon:'fa-tag'},
-            {id:'F', name:'CRISIS', icon:'fa-fire'}
-        ];
-
-        // --- 3. INITIALIZATION (THE BYPASS) ---
-        window.onload = function() {
-            // 1. Render content IMMEDIATELY (Don't wait for net)
-            renderCats();
-            renderScripts('A');
-            startClock();
-            
-            // 2. Fetch Rate ASYNCHRONOUSLY (Non-blocking)
-            fetchRate();
-        };
-
-        // --- 4. ADVANCED NETWORKING ---
-        async function fetchRate() {
-            const statusDot = document.getElementById('status-dot');
-            const statusText = document.getElementById('net-status');
-            const rateDisplay = document.getElementById('live-rate');
-
-            try {
-                // Timeout promise to prevent hanging
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 sec timeout
-
-                const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD', { signal: controller.signal });
-                const data = await response.json();
-                
-                // Success
-                phpRate = data.rates.PHP;
-                rateDisplay.innerText = '₱' + phpRate.toFixed(2);
-                statusDot.classList.remove('bg-yellow-500');
-                statusDot.classList.add('bg-green-500');
-                statusText.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> ONLINE';
-                
-            } catch (error) {
-                // Fail-safe: Use default/manual rate
-                rateDisplay.innerText = '₱' + phpRate.toFixed(2);
-                statusDot.classList.remove('bg-yellow-500
-        
+        // --- DATA ---
+        var db = [
+            {c:'A', t:'Cold DM (IG)', x:"Hi [Name], I noticed a broken link in your bio. I made a list of 3 quick fixes to improve your conversion. Want me to send them? No strings attached."},
+            {c:'A', t:'LinkedIn Founder', x:"Hi [Name], I help founders reclaim 15 hours/week by handling admin chaos. I don't want a job, I want to solve problems. Let's connect."},
+            {c:'A', t:'Real Estate Lead', x:"Hi [Name], I specialize in skip tracing. I can provide 50 verified leads with phone numbers this week as a free trial to prove my quality. Interested?"},
+            {c:'A', t:'E-com Abandoned', x:"Hi [Brand], I noticed you don't have an email flow for abandoned carts. I can set this up to recover 20% of lost sales. No upfront cost, just results."},
+            {c:'A', t:'Upwork Proposal', x:"I read your job post about [Problem] and I know exactly how to fix it. I just did a similar task for a previous client and saved them 20 hours. Here is my plan..."},
+            {c:'A', t:'Re-engage Client', x:"Hi [Name], I have some capacity opening up next month and I enjoyed our last project. Are you still looking for help with [Task]?"},
+            {c:'B', t:'No Experience', x:"I may be new to this platform, but I bring a figure-it-out mindset. You are hiring attitude, not just history. I master new tools in 24 hours."},
+            {c:'B', t:'Rate Too High', x:"I understand budget is a factor. However, a $3 VA might take 5 hours; I finish in 2 hours with zero errors. Ultimately, I cost you less."},
+            {c:'B', t:'See Portfolio?', x:"I prioritize confidentiality, so I don't share private data. However, I can do a paid 'Test Task' right now to prove my skills are live."},
+            {c:'B', t:'Think about it', x:"Completely understand. What is the one thing holding you back right now? I'd love to clarify it before we end the call."},
+            {c:'C', t:'Weekly Report', x:"End-of-Week Update:\n✅ Completed: [Task A]\n⏳ Pending: [Task B]\n🎯 Goal next week: [Goal]\nHave a great weekend!"},
+            {c:'C', t:'Admit Mistake', x:"Flagging that I made an error on [Task]. I've already fixed it by [Solution] and updated our SOP to ensure it never happens again. Taking responsibility."},
+            {c:'C', t:'Suggest Tool', x:"Hi [Name], we spend 3 hours on [Task]. If we use [Tool] ($10/mo), we cut this to 15 mins. Saves us money long term. Thoughts?"},
+            {c:'C', t:'Sick Leave', x:"Hi [Name], I'm not feeling well and need to take a sick day. I've ensured [Urgent Task] is handled. I'll be back on [Date]."},
+            {c:'D', t:'Ask Raise', x:"Hi [Name], since starting 6 months ago, I've increased output by 30%. I'd like to adjust my rate to [New Rate] to reflect this value."},
+            {c:'D', t:'Ask Deposit', x:"To secure my slot in your calendar, I require a 50% upfront deposit. Once received, I will start the onboarding process immediately."},
+            {c:'D', t:'Trial Close
