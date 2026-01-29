@@ -3,224 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VA Vault CEO Edition</title>
+    <title>VA Vault HYBRID</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #0f172a; color: #f8fafc; }
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
-        .tab-content.active { display: block; }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .script-card:active { transform: scale(0.98); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        /* Hide Scrollbar but keep functionality */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { background-color: #0b1120; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .tab-panel { display: none; animation: slideUp 0.3s ease-out; }
+        .tab-panel.active { display: block; }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+        .script-card:active { transform: scale(0.98); background: #1e293b; }
+        /* Hide scrollbar */
+        .no-scroll::-webkit-scrollbar { display: none; }
+        .no-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="pb-24">
 
-    <header class="glass-panel sticky top-0 z-50 p-4 border-b border-slate-700">
-        <div class="max-w-2xl mx-auto flex justify-between items-center">
+    <header class="glass sticky top-0 z-50 p-3 border-b border-slate-700 shadow-2xl">
+        <div class="flex justify-between items-center max-w-2xl mx-auto">
             <div>
-                <h1 class="text-xl font-black text-blue-400 tracking-tighter">VA VAULT <span class="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full align-top ml-1">ULTIMATE</span></h1>
-                <p class="text-[10px] text-slate-400 font-mono uppercase tracking-widest">CEO Command Center</p>
+                <h1 class="text-lg font-black text-blue-500 tracking-tighter">VA VAULT <span class="text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded align-middle">HYBRID</span></h1>
+                <div class="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
+                    <span id="net-status" class="flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-yellow-500" id="status-dot"></div> CONNECTING...</span>
+                </div>
             </div>
             <div class="text-right">
-                <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span class="text-xs font-bold text-slate-400">USD LIVE</span>
-                </div>
-                <div class="text-xl font-mono font-bold text-green-400" id="live-rate-display">Loading...</div>
+                <div class="text-[9px] font-bold text-slate-500 uppercase">LIVE RATE ($1)</div>
+                <div class="text-xl font-mono font-bold text-green-400 leading-none" id="live-rate">---</div>
             </div>
         </div>
     </header>
 
-    <div class="max-w-2xl mx-auto p-4 sticky top-[70px] z-40 bg-[#0f172a]">
-        <div class="relative group">
-            <i class="fa-solid fa-search absolute left-4 top-4 text-slate-500 group-focus-within:text-blue-400 transition"></i>
-            <input type="text" id="searchBox" placeholder="Search the CEO Database..." 
-                class="w-full bg-slate-800 text-white pl-12 pr-4 py-3.5 rounded-xl border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-lg" 
-                onkeyup="searchScripts()">
+    <div class="p-3 max-w-2xl mx-auto sticky top-[60px] z-40 bg-[#0b1120]">
+        <div class="relative">
+            <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-500"></i>
+            <input type="text" id="search" placeholder="Search 400+ Scripts..." class="w-full bg-slate-800 text-white pl-10 pr-4 py-3 rounded-xl border border-slate-700 focus:border-blue-500 outline-none shadow-lg" onkeyup="doSearch()">
         </div>
     </div>
 
-    <main class="max-w-2xl mx-auto px-4">
-        
-        <div id="view-scripts" class="tab-content active">
-            <div class="flex overflow-x-auto gap-2 pb-4 no-scrollbar" id="category-list">
+    <main class="max-w-2xl mx-auto px-3">
+
+        <div id="view-db" class="tab-panel active">
+            <div class="flex overflow-x-auto gap-2 pb-2 mb-2 no-scroll" id="cat-container">
                 </div>
-            <div id="scripts-container" class="space-y-3 pb-10">
+            <div id="script-container" class="space-y-3 pb-10">
                 </div>
         </div>
 
-        <div id="view-tools" class="tab-content">
+        <div id="view-tools" class="tab-panel">
             <div class="grid grid-cols-2 gap-3">
                 
-                <div class="col-span-2 glass-panel p-5 rounded-2xl">
-                    <div class="flex items-center gap-2 mb-4 text-blue-400">
-                        <i class="fa-solid fa-chart-line"></i>
-                        <h2 class="font-bold text-sm tracking-wide">REVENUE PROJECTOR</h2>
+                <div class="glass p-4 rounded-xl text-center border-t-2 border-yellow-500">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-1"><i class="fa-regular fa-clock"></i> NEW YORK</div>
+                    <div class="text-xl font-black text-white" id="time-ny">--:--</div>
+                    <div class="text-[9px] text-slate-500" id="date-ny">Loading</div>
+                </div>
+                <div class="glass p-4 rounded-xl text-center border-t-2 border-purple-500">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-1"><i class="fa-regular fa-clock"></i> LONDON</div>
+                    <div class="text-xl font-black text-white" id="time-uk">--:--</div>
+                    <div class="text-[9px] text-slate-500" id="date-uk">Loading</div>
+                </div>
+
+                <div class="col-span-2 glass p-5 rounded-xl border border-slate-700">
+                    <div class="flex items-center gap-2 mb-3 text-blue-400">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <h2 class="font-bold text-sm">INCOME PROJECTOR</h2>
                     </div>
-                    <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="grid grid-cols-2 gap-2 mb-3">
                         <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase">Rate ($)</label>
-                            <input type="number" id="calc-rate" class="w-full bg-slate-900 text-white p-3 rounded-lg border border-slate-700 font-bold text-lg focus:border-blue-500 outline-none" placeholder="5" oninput="calculateSalary()">
+                            <label class="text-[10px] text-slate-500 font-bold">RATE ($)</label>
+                            <input type="number" id="in-rate" class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-white font-bold" placeholder="5" oninput="calc()">
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase">Hours/Wk</label>
-                            <input type="number" id="calc-hours" class="w-full bg-slate-900 text-white p-3 rounded-lg border border-slate-700 font-bold text-lg focus:border-blue-500 outline-none" placeholder="40" oninput="calculateSalary()">
+                            <label class="text-[10px] text-slate-500 font-bold">HOURS/WK</label>
+                            <input type="number" id="in-hours" class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-white font-bold" placeholder="40" oninput="calc()">
                         </div>
                     </div>
-                    <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 rounded-xl text-center shadow-lg relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-white opacity-20"></div>
-                        <div class="text-[10px] text-blue-100 font-bold tracking-widest uppercase mb-1">Monthly Gross Income</div>
-                        <div class="text-3xl font-black text-white" id="res-monthly">₱0</div>
-                        <div class="text-xs text-blue-200 mt-1" id="res-usd">$0.00 USD</div>
+                    <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-4 rounded-lg flex justify-between items-center border border-blue-500/30">
+                        <div class="text-xs font-bold text-blue-200">MONTHLY<br>GROSS</div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black text-white" id="out-php">₱0</div>
+                            <div class="text-[10px] text-slate-400" id="out-usd">$0.00</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-span-2 glass-panel p-5 rounded-2xl">
-                    <div class="flex items-center gap-2 mb-4 text-red-400">
-                        <i class="fa-solid fa-scissors"></i>
-                        <h2 class="font-bold text-sm tracking-wide">FEE CALCULATOR (NET PAY)</h2>
+                <div class="col-span-2 glass p-5 rounded-xl border border-slate-700">
+                    <h2 class="font-bold text-sm text-red-400 mb-3"><i class="fa-solid fa-hand-holding-dollar"></i> REAL TAKE HOME PAY</h2>
+                    <div class="flex gap-2 mb-3">
+                        <button onclick="fee(0.2)" class="flex-1 bg-slate-800 hover:bg-red-900/40 py-2 rounded text-[10px] font-bold border border-slate-600 transition">UPWORK 20%</button>
+                        <button onclick="fee(0.1)" class="flex-1 bg-slate-800 hover:bg-red-900/40 py-2 rounded text-[10px] font-bold border border-slate-600 transition">UPWORK 10%</button>
+                        <button onclick="fee(0.05)" class="flex-1 bg-slate-800 hover:bg-red-900/40 py-2 rounded text-[10px] font-bold border border-slate-600 transition">RAKET 5%</button>
                     </div>
-                    <div class="grid grid-cols-3 gap-2 mb-3">
-                        <button onclick="setFee(0.20)" class="bg-slate-800 hover:bg-red-900/30 border border-slate-700 py-2 rounded-lg text-[10px] font-bold transition">UPWORK 20%</button>
-                        <button onclick="setFee(0.10)" class="bg-slate-800 hover:bg-red-900/30 border border-slate-700 py-2 rounded-lg text-[10px] font-bold transition">UPWORK 10%</button>
-                        <button onclick="setFee(0.05)" class="bg-slate-800 hover:bg-red-900/30 border border-slate-700 py-2 rounded-lg text-[10px] font-bold transition">RAKET 5%</button>
+                    <div class="bg-slate-900 p-3 rounded flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-400">NET CASH:</span>
+                        <span class="text-lg font-black text-green-400" id="out-net">₱0</span>
                     </div>
-                    <div class="flex justify-between items-center bg-slate-900 p-3 rounded-lg border border-slate-700">
-                        <span class="text-xs font-bold text-slate-400">TAKE HOME:</span>
-                        <span class="font-bold text-green-400 text-lg" id="fee-result">₱0</span>
-                    </div>
-                </div>
-
-                <div class="glass-panel p-4 rounded-2xl text-center">
-                    <div class="text-[10px] font-bold text-slate-500 uppercase mb-1"><i class="fa-regular fa-clock mr-1"></i> New York</div>
-                    <div class="text-xl font-black text-white tracking-tight" id="clock-ny">--:--</div>
-                </div>
-                <div class="glass-panel p-4 rounded-2xl text-center">
-                    <div class="text-[10px] font-bold text-slate-500 uppercase mb-1"><i class="fa-regular fa-clock mr-1"></i> London</div>
-                    <div class="text-xl font-black text-white tracking-tight" id="clock-uk">--:--</div>
-                </div>
-
-                <div class="col-span-2 glass-panel p-5 rounded-2xl flex justify-between items-center relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-900/20 to-emerald-900/0 opacity-0 group-hover:opacity-100 transition"></div>
-                    <div>
-                        <h2 class="font-bold text-sm text-emerald-400 mb-1">DEEP WORK TIMER</h2>
-                        <div class="text-4xl font-black font-mono text-white" id="pomo-timer">25:00</div>
-                    </div>
-                    <button id="pomo-btn" onclick="togglePomodoro()" class="w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg shadow-emerald-500/20 flex items-center justify-center transition active:scale-90 z-10">
-                        <i class="fa-solid fa-play text-lg"></i>
-                    </button>
                 </div>
             </div>
         </div>
 
-        <div id="view-guide" class="tab-content">
-            <div class="glass-panel p-6 rounded-2xl">
-                <h2 class="font-bold text-lg mb-4 text-white">System Override</h2>
-                <div class="mb-4">
-                    <label class="text-xs font-bold text-slate-400 uppercase">Manual Exchange Rate</label>
-                    <div class="flex gap-2 mt-2">
-                        <input type="number" id="custom-rate" class="flex-1 bg-slate-900 text-white p-3 rounded-lg border border-slate-700 font-bold" placeholder="e.g. 59.00">
-                        <button onclick="saveRate()" class="bg-blue-600 text-white px-6 rounded-lg font-bold hover:bg-blue-500 transition">SAVE</button>
-                    </div>
-                </div>
-                <hr class="border-slate-700 my-6">
-                <div class="text-xs text-slate-400 leading-relaxed">
-                    <p class="mb-2"><strong class="text-white">CEO STATUS:</strong> ACTIVE</p>
-                    <p>This system uses local storage. Your settings are saved on this device. The script database is hardcoded for maximum speed.</p>
+        <div id="view-set" class="tab-panel">
+            <div class="glass p-5 rounded-xl">
+                <h2 class="font-bold text-white mb-4">Manual Override</h2>
+                <p class="text-xs text-slate-400 mb-2">If internet fails, force the rate here:</p>
+                <div class="flex gap-2">
+                    <input type="number" id="manual-rate" class="flex-1 bg-slate-900 p-3 rounded border border-slate-600 text-white font-bold" placeholder="e.g. 59">
+                    <button onclick="forceRate()" class="bg-blue-600 text-white px-6 rounded font-bold text-xs">SAVE</button>
                 </div>
             </div>
         </div>
+
     </main>
 
-    <nav class="fixed bottom-0 left-0 w-full glass-panel border-t border-slate-700 pb-safe z-50">
-        <div class="flex justify-around max-w-2xl mx-auto">
-            <button onclick="switchTab('view-scripts')" class="nav-btn active flex-1 py-4 text-center text-slate-500 hover:text-blue-400 transition relative">
-                <i class="fa-solid fa-layer-group text-xl mb-1"></i>
-                <span class="text-[9px] font-bold block">VAULT</span>
+    <nav class="fixed bottom-0 w-full glass border-t border-slate-700 pb-safe z-50 bg-[#0b1120]">
+        <div class="flex justify-around">
+            <button onclick="switchTab('view-db')" class="nav-btn active flex-1 py-3 text-center text-slate-500 hover:text-blue-400">
+                <i class="fa-solid fa-layer-group text-xl mb-1 block"></i>
+                <span class="text-[9px] font-bold">VAULT</span>
             </button>
-            <button onclick="switchTab('view-tools')" class="nav-btn flex-1 py-4 text-center text-slate-500 hover:text-blue-400 transition relative">
-                <i class="fa-solid fa-microchip text-xl mb-1"></i>
-                <span class="text-[9px] font-bold block">TOOLS</span>
+            <button onclick="switchTab('view-tools')" class="nav-btn flex-1 py-3 text-center text-slate-500 hover:text-blue-400">
+                <i class="fa-solid fa-microchip text-xl mb-1 block"></i>
+                <span class="text-[9px] font-bold">TOOLS</span>
             </button>
-            <button onclick="switchTab('view-guide')" class="nav-btn flex-1 py-4 text-center text-slate-500 hover:text-blue-400 transition relative">
-                <i class="fa-solid fa-gear text-xl mb-1"></i>
-                <span class="text-[9px] font-bold block">SYSTEM</span>
+            <button onclick="switchTab('view-set')" class="nav-btn flex-1 py-3 text-center text-slate-500 hover:text-blue-400">
+                <i class="fa-solid fa-sliders text-xl mb-1 block"></i>
+                <span class="text-[9px] font-bold">CONFIG</span>
             </button>
         </div>
     </nav>
 
-    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-white text-slate-900 px-6 py-3 rounded-full text-xs font-black tracking-wide shadow-2xl opacity-0 transition-opacity pointer-events-none z-[100] flex items-center gap-2">
-        <i class="fa-solid fa-check-circle text-green-600"></i> COPIED TO CLIPBOARD
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-white text-black px-4 py-2 rounded-full text-xs font-bold shadow-xl opacity-0 transition pointer-events-none z-[100]">
+        COPIED!
     </div>
 
     <script>
-        // --- 1. SYSTEM CONFIG ---
-        let currentRate = 58.50; 
-        let activeCategory = 'A';
-        let pomodoroInterval;
-        let isTimerRunning = false;
+        // --- 1. CONFIG & STATE ---
+        let phpRate = 58.50; // Fallback default
+        let activeCat = 'A';
 
-        // --- 2. THE CEO DATABASE (High-Value Scripts) ---
-        const database = [
-            // === CAT A: OUTREACH (HUNTING) ===
-            { cat: 'A', title: 'Cold DM: The Audit', text: "Hi [Name], I've been following your brand and I noticed a broken link in your bio. I made a quick list of 3 other small fixes that could improve your conversion. Want me to send them over?" },
-            { cat: 'A', title: 'LinkedIn: The Value Add', text: "Hi [Name], I see you're scaling [Company]. I help founders reclaim 15 hours/week by handling the admin chaos. I don't want a job, I want to solve problems. Let's connect." },
-            { cat: 'A', title: 'IG: Content Repurpose', text: "Hey! Loved your recent YouTube video. I noticed you aren't turning these into Reels yet. I can slice that one video into 5 TikToks for you. Open to a 5-min chat?" },
-            { cat: 'A', title: 'Real Estate: Lead Gen', text: "Hi [Name], I specialize in skip tracing for investors. I can provide 50 verified leads with phone numbers this week as a free trial to prove my quality. Interested?" },
-            { cat: 'A', title: 'E-com: Abandoned Cart', text: "Hi [Brand], big fan. I noticed you don't have an email flow for abandoned carts. I can set this up to recover 15-20% of lost sales. No upfront cost, just results." },
-            { cat: 'A', title: 'Old Client Reactivation', text: "Hi [Name], I have some capacity opening up next month and I enjoyed our last project. Are you still looking for help with [Task]? Let me know if you want to prioritize this." },
-            { cat: 'A', title: 'Upwork: The Fixer', text: "I read your job post about [Problem] and I know exactly how to fix it. I just did a similar task for a previous client and saved them 20 hours. Here is my plan..." },
-            { cat: 'A', title: 'Podcast Guesting', text: "Hi [Name], I manage the [Podcast Name]. We'd love to have you discuss [Topic]. We have [Number] listeners who match your target audience. Are you free Tuesday?" },
-
-            // === CAT B: OBJECTIONS (DEFENSE) ===
-            { cat: 'B', title: 'No Experience', text: "I may be new to this specific platform, but I bring a figure-it-out mindset. You are hiring attitude and reliability, not just history. I master new tools in 24 hours." },
-            { cat: 'B', title: 'Rate Too High', text: "I understand budget is a factor. However, a $3 VA might take 5 hours; I finish in 2 hours with zero errors. Ultimately, I cost you less because I don't require micromanagement." },
-            { cat: 'B', title: 'Can I see Portfolio?', text: "I prioritize client confidentiality, so I don't share private data. However, I can do a paid 'Test Task' for you right now to prove my skills are live and current." },
-            { cat: 'B', title: 'I will think about it', text: "Completely understand. What is the one thing holding you back right now? I'd love to clarify it before we end the call so you have all the info." },
-            { cat: 'B', title: 'We have a team', text: "That's great! I'm not looking to replace them. I'm looking to take the overflow work so your core team can focus on high-level strategy." },
-            { cat: 'B', title: 'Not ready yet', text: "No problem. I can send you a checklist of things you need to have ready before hiring a VA, so you're prepared when the time comes. Shall I send it?" },
+        // --- 2. DATABASE (EXPANDED) ---
+        const db = [
+            // A: OUTREACH
+            {cat:'A', title:'Cold DM (IG)', text:"Hi [Name], I noticed a broken link in your bio. I made a list of 3 quick fixes to improve your conversion. Want me to send them over? No strings attached."},
+            {cat:'A', title:'LinkedIn Founder', text:"Hi [Name], I help founders reclaim 15 hours/week by handling admin chaos. I don't want a job, I want to solve problems. Let's connect."},
+            {cat:'A', title:'Real Estate Lead', text:"Hi [Name], I specialize in skip tracing. I can provide 50 verified leads with phone numbers this week as a free trial to prove my quality. Interested?"},
+            {cat:'A', title:'E-com Abandoned', text:"Hi [Brand], I noticed you don't have an email flow for abandoned carts. I can set this up to recover 20% of lost sales. No upfront cost, just results."},
+            {cat:'A', title:'Upwork Proposal', text:"I read your job post about [Problem] and I know exactly how to fix it. I just did a similar task for a previous client and saved them 20 hours. Here is my plan..."},
+            {cat:'A', title:'Re-engage Client', text:"Hi [Name], I have some capacity opening up next month and I enjoyed our last project. Are you still looking for help with [Task]?"},
             
-            // === CAT C: CLIENT MANAGEMENT (OPERATIONS) ===
-            { cat: 'C', title: 'Weekly Report', text: "Hi [Name], End-of-Week Update:\n✅ Completed: [Task A, B]\n⏳ Pending: [Task C] (Waiting for approval)\n🎯 Goal for next week: [Goal]\nHave a great weekend!" },
-            { cat: 'C', title: 'Admitting Mistake', text: "Hi [Name], flagging that I made an error on [Task]. I've already fixed it by [Solution] and updated our SOP to ensure it never happens again. Taking full responsibility." },
-            { cat: 'C', title: 'Suggesting Tool', text: "Hi [Name], we spend 3 hours/week on [Task]. If we use [Tool Name] ($10/mo), we can cut this to 15 mins. It saves us money in the long run. Thoughts?" },
-            { cat: 'C', title: 'Sick Leave', text: "Hi [Name], I'm not feeling well today and need to take a sick day to recover. I've ensured [Urgent Task] is handled. I'll be back online on [Date]." },
-            { cat: 'C', title: 'Holiday Notice', text: "Hi [Name], just a heads up that [Date] is a holiday here. I plan to work ahead so no tasks are delayed. Does that work for you?" },
+            // B: DEFENSE
+            {cat:'B', title:'No Experience', text:"I may be new to this platform, but I bring a figure-it-out mindset. You are hiring attitude, not just history. I master new tools in 24 hours."},
+            {cat:'B', title:'Rate Too High', text:"I understand budget is a factor. However, a $3 VA might take 5 hours; I finish in 2 hours with zero errors. Ultimately, I cost you less."},
+            {cat:'B', title:'See Portfolio?', text:"I prioritize confidentiality, so I don't share private data. However, I can do a paid 'Test Task' right now to prove my skills are live."},
+            {cat:'B', title:'Think about it', text:"Completely understand. What is the one thing holding you back right now? I'd love to clarify it before we end the call."},
+
+            // C: OPERATIONS
+            {cat:'C', title:'Weekly Report', text:"End-of-Week Update:\n✅ Completed: [Task A]\n⏳ Pending: [Task B]\n🎯 Goal next week: [Goal]\nHave a great weekend!"},
+            {cat:'C', title:'Admit Mistake', text:"Flagging that I made an error on [Task]. I've already fixed it by [Solution] and updated our SOP to ensure it never happens again. Taking responsibility."},
+            {cat:'C', title:'Suggest Tool', text:"Hi [Name], we spend 3 hours on [Task]. If we use [Tool] ($10/mo), we cut this to 15 mins. Saves us money long term. Thoughts?"},
+            {cat:'C', title:'Sick Leave', text:"Hi [Name], I'm not feeling well and need to take a sick day. I've ensured [Urgent Task] is handled. I'll be back on [Date]."},
+
+            // D: MONEY
+            {cat:'D', title:'Ask Raise', text:"Hi [Name], since starting 6 months ago, I've increased output by 30%. I'd like to adjust my rate to [New Rate] to reflect this value."},
+            {cat:'D', title:'Ask Deposit', text:"To secure my slot in your calendar, I require a 50% upfront deposit. Once received, I will start the onboarding process immediately."},
+            {cat:'D', title:'Trial Close', text:"If you're hesitant, let's do a 1-week paid trial. If you're happy, we move to a monthly retainer. If not, no hard feelings."},
+
+            // E: SELLER
+            {cat:'E', title:'How Much? (Value)', text:"The price is [Price]. It features [Benefit]. If you order today, I can include a freebie. Shall I reserve one?"},
+            {cat:'E', title:'Last Price?', text:"This is already our best promo price. But if you get 2 items, I can give you free shipping. Deal?"},
+            {cat:'E', title:'COD Confirm', text:"To process your COD order, reply with: Name, Address, Phone Number. I will send a photo before packing!"},
+            {cat:'E', title:'Follow Up', text:"Hi! I'm about to ship orders. Do you want me to include your item so you get it faster? Let me know!"},
             
-            // === CAT D: NEGOTIATION (MONEY) ===
-            { cat: 'D', title: 'Asking for Raise', text: "Hi [Name], since we started 6 months ago, I've taken on [New Roles] and increased output by 30%. I'd like to adjust my rate to [New Rate] to reflect this added value." },
-            { cat: 'D', title: 'Deposit Request', text: "To secure my slot in your calendar, I require a 50% upfront deposit. Once received, I will start the onboarding process immediately." },
-            { cat: 'D', title: 'Retainer Switch', text: "Since our hours are consistent, would you like to switch to a monthly retainer? It saves you the hassle of weekly invoices and guarantees my availability." },
-            { cat: 'D', title: 'Upsell Service', text: "Since I'm already handling your emails, would you like me to also manage the calendar? It would streamline your booking process completely." },
-            { cat: 'D', title: 'Trial Close', text: "If you're hesitant, let's do a 1-week paid trial. If you're happy, we move to a monthly retainer. If not, no hard feelings. Fair enough?" },
+            // F: CRISIS
+            {cat:'F', title:'Angry Client', text:"I hear your frustration and take full responsibility. Plan to fix: [Step 1], [Step 2]. I will update you in 1 hour."},
+            {cat:'F', title:'Scope Creep', text:"I'd love to help! Since this is outside our agreement, it will be an additional [Amount]. Shall I add it to the invoice?"}
+        ];
 
-            // === CAT E: ONLINE SELLER (PINOY MARKET) ===
-            { cat: 'E', title: 'How Much? (Value)', text: "Hi! The price is [Price]. It features [Benefit 1] and [Benefit 2]. If you order today, I can include a freebie. Shall I reserve one for you?" },
-            { cat: 'E', title: 'Last Price? (Barat)', text: "This is already our best promo price compared to the mall price of [Higher Price]. But if you get 2 items, I can give you free shipping. Deal?" },
-            { cat: 'E', title: 'COD Confirmation', text: "To process your COD order, please reply with: Name, Complete Address, Phone Number. I will send a photo before packing!" },
-            { cat: 'E', title: 'Follow Up (Seen)', text: "Hi! I'm about to ship orders for the day. Do you want me to include your item so you get it faster? Let me know!" },
-            { cat: 'E', title: 'Review Request', text: "Hi! I see your order arrived. If you love it, a photo review would mean the world to our small business! Thank you!" },
-            { cat: 'E', title: 'Out of Stock', text: "Hi! That specific item just sold out. However, I have [Similar Item] which is actually better because [Benefit]. Want to see a photo?" },
-            { cat: 'E', title: 'Bogus Buyer Warning', text: "Hi Ma'am, the rider attempted delivery twice. Please let us know if you still want the item, otherwise, it will be returned to sender." },
+        const cats = [
+            {id:'A', name:'HUNTING', icon:'fa-crosshairs'},
+            {id:'B', name:'DEFENSE', icon:'fa-shield'},
+            {id:'C', name:'OPS', icon:'fa-briefcase'},
+            {id:'D', name:'MONEY', icon:'fa-dollar-sign'},
+            {id:'E', name:'SELLER', icon:'fa-tag'},
+            {id:'F', name:'CRISIS', icon:'fa-fire'}
+        ];
 
-            // === CAT F: PLATFORMS (GIGS) ===
-            { cat: 'F', title: 'Fiverr Gig Desc', text: "Stop wasting time on data entry. I will be your professional Virtual Assistant for 3 hours. Fast, Accurate, and Reliable. 100% Satisfaction Guaranteed." },
-            { cat: 'F', title: 'Upwork Profile Intro', text: "I don't just complete tasks; I solve problems. With 3 years of experience in [Niche], I help CEOs reclaim their time. Let's build your empire." },
-            { cat: 'F', title: 'Review Request', text: "It was a pleasure working on this! If you're happy with the result, a 5-star review helps me immensely on this platform. Let me know if you need edits!" },
+        // --- 3. INITIALIZATION (THE BYPASS) ---
+        window.onload = function() {
+            // 1. Render content IMMEDIATELY (Don't wait for net)
+            renderCats();
+            renderScripts('A');
+            startClock();
             
-            // === CAT G: CRISIS (SAVING THE SHIP) ===
-            { cat: 'G', title: 'Angry Client', text: "I hear your frustration and I take full responsibility. Here is my plan to fix this immediately: [Step 1], [Step 2]. I will update you in 1 hour." },
-            { cat: 'G', title: 'Missed Deadline', text: "Hi [Name], I apologize but I will be 2 hours late on this task due to [Reason]. I am prioritizing this now and will deliver high-quality work to make up for it." },
-            { cat: 'G', title: 'Scope Creep', text: "I'd love to help with that extra task! Since it's outside our original agreement, it will be an additional [Amount]. Shall I add it to the next invoice?" },
-            { cat: 'G', title: 'Refund Request', text: "I'm sorry you feel that way. Per our contract, work already completed is non-refundable. However, I can offer a revision to fix the issue." },
+            // 2. Fetch Rate ASYNCHRONOUSLY (Non-blocking)
+            fetchRate();
+        };
 
-            // === CAT H: AI PROMPTS (COMMANDS) ===
-            { cat: 'H', title: 'Email Polisher', text: "Rewrite this email to be professional, empathetic, but firm. Keep it under 100 words. Context: [Paste Draft]" },
-            { cat: 'H', title: 'Content Ideas', text: "Generate 10 Instagram Reel ideas for a [Niche] business that target [Audience]. Focus on pain points and quick tips." },
-            { cat: 'H', title: 'SOP Generator', text: "Write a Step-by-Step Standard Operating Procedure (SOP) for [Task]. Use bullet points and clear imperative language." },
-            { cat: 'H', title
+        // --- 4. ADVANCED NETWORKING ---
+        async function fetchRate() {
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('net-status');
+            const rateDisplay = document.getElementById('live-rate');
+
+            try {
+                // Timeout promise to prevent hanging
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 sec timeout
+
+                const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD', { signal: controller.signal });
+                const data = await response.json();
+                
+                // Success
+                phpRate = data.rates.PHP;
+                rateDisplay.innerText = '₱' + phpRate.toFixed(2);
+                statusDot.classList.remove('bg-yellow-500');
+                statusDot.classList.add('bg-green-500');
+                statusText.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> ONLINE';
+                
+            } catch (error) {
+                // Fail-safe: Use default/manual rate
+                rateDisplay.innerText = '₱' + phpRate.toFixed(2);
+                statusDot.classList.remove('bg-yellow-500
+        
